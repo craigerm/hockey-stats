@@ -5,18 +5,16 @@ require 'open-uri'
 require 'date'
 require 'pry'
 require './tasks/scrape'
+
 # Total games per year: 1,230
 # 30 teams
 
-# 2012-2013 from Jan 19 2013 - June 24 2013
-#http://www.nhl.com/ice/scores.htm?date=01/19/2013
-
-# Selector for getting box score links for the score pages
-# $('.sbGame > .gcLinks > div a[shape=rect]:contains("BOXSCORE")')
-
 ROOT_FOLDER = './pages'
-DELAY = 0.1 #seconds
 
+# Delay for pulling data
+DELAY = 0.1
+
+# The season start and end date including playoffs
 SEASONS = {
   2013 => {:start => Date.new(2013, 1, 19), :end => Date.new(2013, 6, 24) },
   2012 => {:start => Date.new(2011, 10, 1), :end => Date.new(2012, 6, 11) },
@@ -26,7 +24,7 @@ SEASONS = {
 }
 
 # The season for processing
-SEASON = ENV['season'] || #2013
+SEASON = ENV['season']
 
 @start_time= nil
 
@@ -55,10 +53,7 @@ def get_scores(start_date, end_date)
   stop
 end
 
-#http://www.nhl.com/scores/htmlreports/20102011/ES020001.HTM
-#/ice/boxscore.htm?id=2012020313
 def get_event_summary(year)
-
   boxscores_path = "#{ROOT_FOLDER}/#{year}/boxscores.txt"
   game_ids = "#{ROOT_FOLDER}/#{year}/game_ids.txt"
 
@@ -171,7 +166,7 @@ namespace :pages do
     get_seasons.each do |year, date|
       return unless year == 2013
       run 'play by plays', year do
-        #get_plays(year)
+        get_plays(year)
       end
     end
   end

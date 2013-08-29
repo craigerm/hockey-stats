@@ -12,7 +12,7 @@ require './tasks/scrape'
 ROOT_FOLDER = './pages'
 
 # Delay for pulling data
-DELAY = 0.1
+DELAY = 0.05
 
 # The season start and end date including playoffs
 SEASONS = {
@@ -90,7 +90,6 @@ def get_game_summaries(year)
     url = report_url('ES', year, id)
     filename = "#{id}.htm"
     save_page("#{year}/event_summaries", filename, url)
-    break
   end
 end
 
@@ -138,27 +137,27 @@ end
 namespace :pages do
 
   task :scores do
-    run 'score pages' do
+    run 'score pages' do |year, dates|
       get_scores(dates[:start], dates[:end])
     end
   end
 
   task :events do
-    run 'game ids' do
+    run 'game ids' do |year|
       get_event_summary(year)
     end
   end
 
   task :summaries do
-    next unless year == 2013
-    run 'game summaries' do
+    run 'game summaries' do |year|
+      next unless year == 2013
       get_game_summaries(year)
     end
   end
 
   task :plays do
-    next unless year == 2013
-    run 'play by plays' do |year, dates|
+    run 'play by plays' do |year|
+      next unless year == 2013
       get_plays(year)
     end
   end

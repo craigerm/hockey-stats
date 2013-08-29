@@ -100,7 +100,6 @@ def get_plays(year)
     url = report_url('PL', year, id)
     filename = "#{id}.htm"
     save_page("#{year}/plays", filename, url)
-    break
   end
 end
 

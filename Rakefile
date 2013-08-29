@@ -111,7 +111,6 @@ def get_seasons
   return SEASONS
 end
 
-# GENERIC SCRAPING
 def save_page(folder, filename, url)
   FileUtils.mkdir_p "#{ROOT_FOLDER}/#{folder}"
   dest_filename = "#{ROOT_FOLDER}/#{folder}/#{filename}"
@@ -125,49 +124,42 @@ def save_page(folder, filename, url)
 end
 
 
-def run(title, year, &block)
-  puts "Grabbing #{title} ids for season #{year}"
-  puts "======================================="
-  start
-  block.call
-  stop
-  puts "\n\n"
+def run(title, &block)
+  get_seasons.each do |year, dates|
+    puts "Grabbing #{title} ids for season #{year}"
+    puts "======================================="
+    start
+    block.call(year, dates)
+    stop
+    puts "\n\n"
+  end
 end
 
 namespace :pages do
 
   task :scores do
-    raise 'TURNED OFF!' # OFf just so we don't remove our existing pages
-    get_seasons.each do |year,dates|
-      run 'score pages', year do
-        get_scores(dates[:start], dates[:end])
-      end
+    run 'score pages' do
+      get_scores(dates[:start], dates[:end])
     end
   end
 
   task :events do
-    get_seasons.each do |year, date|
-      run 'game ids', year do
-        get_event_summary(year)
-      end
+    run 'game ids' do
+      get_event_summary(year)
     end
   end
 
   task :summaries do
-    get_seasons.each do |year, date|
-      next unless year == 2013
-      run 'game summaries', year do
-        get_game_summaries(year)
-      end
+    next unless year == 2013
+    run 'game summaries' do
+      get_game_summaries(year)
     end
   end
 
   task :plays do
-    get_seasons.each do |year, date|
-      return unless year == 2013
-      run 'play by plays', year do
-        get_plays(year)
-      end
+    next unless year == 2013
+    run 'play by plays' do |year, dates|
+      get_plays(year)
     end
   end
 end

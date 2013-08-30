@@ -123,7 +123,7 @@ end
 
 def run(title, &block)
   get_seasons.each do |year, dates|
-    puts "Grabbing #{title} ids for season #{year}"
+    puts "#{title} for season #{year}"
     puts "======================================="
     start
     block.call(year, dates)

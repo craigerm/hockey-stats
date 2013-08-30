@@ -104,8 +104,7 @@ def get_plays(year)
 end
 
 def get_seasons
-  return SEASONS unless SEASON
-  return [SEASONS[SEASON]] if SEASON
+  raise 'Running for a single season not implemented' if SEASON
   return SEASONS
 end
 

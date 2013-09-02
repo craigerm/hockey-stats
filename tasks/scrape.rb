@@ -3,7 +3,7 @@ def raw_int(str)
 end
 
 def str(str)
-  str
+  str.strip
 end
 
 def raw_date(str)
@@ -12,7 +12,9 @@ end
 
 def add_venue_data(info, s)
   parts = s.split('@')
-  info[:venue] = parts[1]
+  venue =  parts[1]
+  venue.slice!(0, 1)
+  info[:venue] = venue
   info[:attendence] = raw_int(parts[0].split('. ')[1])
 end
 

@@ -64,7 +64,6 @@ end
 namespace :scrape do
   task :games do
     scrape_summaries(2013)
-    #obj = {:date => '2013-05-01', :attendence => 20132, :start => '7.38'}
   end
 end
 

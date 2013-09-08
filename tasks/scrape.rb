@@ -46,17 +46,55 @@ def add_header_info(doc, info)
   info[:date] = raw_date(doc.css('#GameInfo tr:eq(4) > td').first.content)
 end
 
+def get_player_stats(row)
+  {
+    :number => row.css('td:eq(1)').first.content,
+    :position => row.css('td:eq(2)').first.content,
+    :name => row.css('td:eq(3)').first.content
+  }
+end
+
+def get_player_rows(doc)
+  container = doc.css('body > xmlfile > table > tr:eq(8) table')
+  rows = container.css('tr')
+  home = []
+  away = []
+
+  team = away
+
+  rows.each_with_index do |row, index|
+
+    unless index > 1
+      next
+    end
+
+    classes = row.get_attribute(:class)
+    if classes == 'evenColor' || classes == 'oddColor'
+      team << get_player_stats(row)
+    else
+      team = home
+    end
+  end
+
+  {:home_stats => home, :away_stats => away}
+end
+
+def add_player_stats(doc, info)
+  stats = get_player_rows(doc)
+  info.merge!(stats)
+end
+
 def scrape_summaries(year)
   dir = "#{ROOT_FOLDER}/#{year}/event_summaries" 
   Dir.foreach(dir) do |filename|
     next if filename == '.' || filename == '..'
-    puts "FILE #{filename}"
+    #puts "FILE #{filename}"
     doc = Nokogiri::HTML(open("#{dir}/#{filename}"))
     info = {}
     add_header_info(doc, info)
+    add_player_stats(doc, info)
 
-    puts "STR => #{info}"
-
+    puts info.to_json
     break
   end
 end

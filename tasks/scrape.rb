@@ -124,6 +124,36 @@ def get_player_rows(doc)
   {:home_stats => home, :away_stats => away}
 end
 
+def get_team_totals(row)
+  {
+    :goals => get_int(row, 'td:eq(2)'),
+    :assists => get_int(row, 'td:eq(3)'),
+    :points => get_int(row, 'td:eq(4)'),
+    :plus_minus => get_int(row, 'td:eq(5)'),
+    :num_penalties => get_int(row, 'td:eq(6)'),
+    :penalty_minutes => get_int(row, 'td:eq(7)'),
+    :shots => get_int(row, 'td:eq(14)'),
+    :block_attempts => get_int(row, 'td:eq(15)'),
+    :missed_shots => get_int(row, 'td:eq(16)'),
+    :hits => get_int(row, 'td:eq(17)'),
+    :giveaways => get_int(row, 'td:eq(18)'),
+    :takeaways => get_int(row, 'td:eq(19)'),
+    :shots_blocked => get_int(row, 'td:eq(20)'),
+    :faceoffs => {
+      :won => get_int(row, 'td:eq(21)'),
+      :lost => get_int(row, 'td:eq(22)'),
+      :percentage => get_percentage(row, 'td:eq(23)')
+    }
+  }
+end
+
+def add_team_totals(doc, info)
+  rows = doc.css('body > xmlfile > table > tr:eq(8) table tr.bold')
+  info[:away_totals] = get_team_totals(rows[0])
+  info[:home_totals] = get_team_totals(rows[1])
+end
+
+
 def add_player_stats(doc, info)
   stats = get_player_rows(doc)
   info.merge!(stats)
@@ -138,6 +168,7 @@ def scrape_summaries(year)
     info = {}
     add_header_info(doc, info)
     add_player_stats(doc, info)
+    add_team_totals(doc, info)
 
     puts info.to_json
     break

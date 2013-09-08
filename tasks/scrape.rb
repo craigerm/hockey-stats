@@ -6,8 +6,24 @@ def str(str)
   str.strip.upcase
 end
 
+def percentage(str)
+  raw_int(str) / 100
+end
+
 def raw_date(str)
   DateTime.parse(str).strftime('%Y-%m-%d')
+end
+
+def get_int(row, selector)
+  raw_int(row.css(selector).first.content)
+end
+
+def get_string(row, selector)
+  str(row.css(selector).first.content)
+end
+
+def get_percentage(row, selector)
+  percentage(row.css(selector).first.content)
 end
 
 def add_venue_data(info, s)
@@ -48,9 +64,37 @@ end
 
 def get_player_stats(row)
   {
-    :number => row.css('td:eq(1)').first.content,
+    :number => get_int(row, 'td:eq(1)'),
     :position => row.css('td:eq(2)').first.content,
-    :name => row.css('td:eq(3)').first.content
+    :name => row.css('td:eq(3)').first.content,
+    :stats => {
+      :goals => get_int(row, 'td:eq(4)'),
+      :assists  => get_int(row, 'td:eq(5)'),
+      :points  => get_int(row, 'td:eq(6)'),
+      :plus_minus => get_int(row, 'td:eq(7)'),
+      :num_penalties => get_int(row, 'td:eq(8)'),
+      :penalty_minutes => get_int(row, 'td:eq(9)'),
+      :shifts => {
+        :total_ice_time => get_string(row, 'td:eq(10)'),
+        :count => get_int(row, 'td:eq(11)'),
+        :average_ice_time => get_int(row, 'td:eq(12)'),
+        :pp_time => get_string(row, 'td:eq(13)'),
+        :sh_time => get_string(row, 'td:eq(14)'),
+        :ev_time => get_string(row, 'td:eq(15)')
+      },
+      :shots => get_int(row, 'td:eq(16)'),
+      :block_attempts => get_int(row, 'td:eq(17)'),
+      :missed_shots => get_int(row, 'td:eq(18)'),
+      :hits_given => get_int(row, 'td:eq(19)'),
+      :giveaways => get_int(row, 'td:eq(20)'),
+      :takeaways => get_int(row, 'td:eq(21)'),
+      :shots_blocked => get_int(row, 'td:eq(22)'),
+      :faceoffs => {
+        :won => get_int(row, 'td:eq(23)'),
+        :lost => get_int(row, 'td:eq(24)'),
+        :percentage => get_percentage(row, 'td:eq(25)')
+      }
+    }
   }
 end
 
@@ -71,6 +115,7 @@ def get_player_rows(doc)
     classes = row.get_attribute(:class)
     if classes == 'evenColor' || classes == 'oddColor'
       team << get_player_stats(row)
+      break
     else
       team = home
     end

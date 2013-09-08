@@ -124,7 +124,39 @@ def get_player_rows(doc)
   {:home_stats => home, :away_stats => away}
 end
 
-def get_team_totals(row)
+def get_team_summary(table)
+  {
+    :faceoffs => {
+      :even_strength => {
+        :won => 500,
+        :lost => 500,
+        :percentage => 0.51
+      }
+    }
+  }
+end
+
+def get_team_summaries(doc, info)
+  tables = doc.css('body > xmlfile > table > tr:eq(4) table')
+  {
+    :away_totals => get_team_summary(tables[3])
+  }
+end
+
+def get_faceoff_stats(str)
+  parts = str.gsub('-', '/').split('/')
+  won = raw_int(parts[0])
+  total = raw_int(parts[1])
+  percent = percentage(parts[2])
+  {
+    :won => won,
+    :lost => total - won,
+    :percentage => percent
+  }
+end
+
+def get_team_totals(row, faceoff_row)
+  faceoff_cells = faceoff_row.css('td')
   {
     :goals => get_int(row, 'td:eq(2)'),
     :assists => get_int(row, 'td:eq(3)'),
@@ -140,17 +172,27 @@ def get_team_totals(row)
     :takeaways => get_int(row, 'td:eq(19)'),
     :shots_blocked => get_int(row, 'td:eq(20)'),
     :faceoffs => {
-      :won => get_int(row, 'td:eq(21)'),
-      :lost => get_int(row, 'td:eq(22)'),
-      :percentage => get_percentage(row, 'td:eq(23)')
+      :even_strength => get_faceoff_stats(faceoff_cells[0].content),
+      :power_play => get_faceoff_stats(faceoff_cells[1].content),
+      :short_handed => get_faceoff_stats(faceoff_cells[2].content),
+      :total => {
+        :won => get_int(row, 'td:eq(21)'),
+        :lost => get_int(row, 'td:eq(22)'),
+        :percentage => get_percentage(row, 'td:eq(23)')
+      }
     }
   }
 end
 
 def add_team_totals(doc, info)
+  # THIS WORKS FOR THE  shots summary
+  #doc.css('body > xmlfile > table > tr:eq(3) > td > table > tr:eq(2) table tr:eq(2)')
+  away_row = doc.css('body > xmlfile > table > tr:eq(5) > td > table > tr:eq(2) table tr:eq(2)')
+  #tables = doc.css('body > xmlfile > table > tr:eq(4) table')
   rows = doc.css('body > xmlfile > table > tr:eq(8) table tr.bold')
-  info[:away_totals] = get_team_totals(rows[0])
-  info[:home_totals] = get_team_totals(rows[1])
+  info[:away_totals] = get_team_totals(rows[0], away_row)
+  #info[:home_totals] = get_team_totals(rows[1])
+  info
 end
 
 
@@ -166,8 +208,8 @@ def scrape_summaries(year)
     #puts "FILE #{filename}"
     doc = Nokogiri::HTML(open("#{dir}/#{filename}"))
     info = {}
-    add_header_info(doc, info)
-    add_player_stats(doc, info)
+    #add_header_info(doc, info)
+    #add_player_stats(doc, info)
     add_team_totals(doc, info)
 
     puts info.to_json

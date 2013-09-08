@@ -155,8 +155,7 @@ def get_faceoff_stats(str)
   }
 end
 
-def get_team_totals(row, faceoff_row)
-  faceoff_cells = faceoff_row.css('td')
+def get_team_totals(row, faceoff_cells)
   {
     :goals => get_int(row, 'td:eq(2)'),
     :assists => get_int(row, 'td:eq(3)'),
@@ -187,11 +186,10 @@ end
 def add_team_totals(doc, info)
   # THIS WORKS FOR THE  shots summary
   #doc.css('body > xmlfile > table > tr:eq(3) > td > table > tr:eq(2) table tr:eq(2)')
-  away_row = doc.css('body > xmlfile > table > tr:eq(5) > td > table > tr:eq(2) table tr:eq(2)')
-  #tables = doc.css('body > xmlfile > table > tr:eq(4) table')
+  faceoff_cells = doc.css('body > xmlfile > table > tr:eq(5) > td > table > tr:eq(2) table tr:eq(2) td')
   rows = doc.css('body > xmlfile > table > tr:eq(8) table tr.bold')
-  info[:away_totals] = get_team_totals(rows[0], away_row)
-  #info[:home_totals] = get_team_totals(rows[1])
+  info[:away_totals] = get_team_totals(rows[0], faceoff_cells[0..3])
+  info[:home_totals] = get_team_totals(rows[1], faceoff_cells[4..7])
   info
 end
 

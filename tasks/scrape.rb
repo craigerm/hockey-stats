@@ -183,6 +183,7 @@ def get_team_totals(row, faceoff_cells)
   }
 end
 
+# TODO: Add team shot totals and game duration
 def add_team_totals(doc, info)
   # THIS WORKS FOR THE  shots summary
   #doc.css('body > xmlfile > table > tr:eq(3) > td > table > tr:eq(2) table tr:eq(2)')

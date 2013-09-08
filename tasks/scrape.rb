@@ -7,7 +7,7 @@ def str(str)
 end
 
 def percentage(str)
-  raw_int(str) / 100
+  raw_int(str) / 100.0
 end
 
 def raw_date(str)

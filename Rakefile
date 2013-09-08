@@ -3,6 +3,7 @@ require 'active_support/core_ext/numeric/time'
 require 'nokogiri'
 require 'open-uri'
 require 'date'
+require 'json'
 require 'pry'
 require './tasks/scrape'
 

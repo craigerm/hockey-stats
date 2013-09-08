@@ -77,7 +77,7 @@ def get_player_stats(row)
       :shifts => {
         :total_ice_time => get_string(row, 'td:eq(10)'),
         :count => get_int(row, 'td:eq(11)'),
-        :average_ice_time => get_int(row, 'td:eq(12)'),
+        :average_ice_time => get_string(row, 'td:eq(12)'),
         :pp_time => get_string(row, 'td:eq(13)'),
         :sh_time => get_string(row, 'td:eq(14)'),
         :ev_time => get_string(row, 'td:eq(15)')

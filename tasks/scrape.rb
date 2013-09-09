@@ -157,11 +157,12 @@ end
 
 def get_shot_stats(str)
   p = str.split('-')
-  scored = raw_int(p[0])
-  total = raw_int(p[1])
+  scored = p.length == 2 ? raw_int(p[0]) : 0
+  total = p.length == 2 ? raw_int(p[1]) : 0
   {
     :scored => scored,
-    :missed => total - scored
+    :missed => total - scored,
+    :total => total
   }
 end
 
@@ -174,40 +175,45 @@ def get_team_totals(row, faceoff_cells, shot_cells)
     :num_penalties => get_int(row, 'td:eq(6)'),
     :penalty_minutes => get_int(row, 'td:eq(7)'),
     :shots => {
-      :total => get_int(row, 'td:eq(14)'),
-      :even_strength => get_shot_stats(shot_cells.css('table:eq(1) tr:eq(2) td').first.content)
+      :total => get_shot_stats(shot_cells.css('table:eq(1) tr:eq(2) td')[3].content),
+      :even_strength => get_shot_stats(shot_cells.css('table:eq(1) tr:eq(2) td').first.content),
+      :power_play => get_shot_stats(shot_cells.css('table:eq(1) tr:eq(2) td')[1].content),
+      :short_handed => get_shot_stats(shot_cells.css('table:eq(1) tr:eq(2) td')[2].content),
+      :five_vs_five => get_shot_stats(shot_cells.css('table:eq(1) tr:eq(2) td')[2].content),
+      :five_vs_four => nil,
+      :four_vs_five => nil,
+      :four_vs_four => nil,
+      :four_vs_three => nil,
+      :three_vs_five => nil,
+      :three_vs_four => nil,
+      :three_vs_three => nil
     }
-    #:block_attempts => get_int(row, 'td:eq(15)'),
-    #:missed_shots => get_int(row, 'td:eq(16)'),
-    #:hits => get_int(row, 'td:eq(17)'),
-    #:giveaways => get_int(row, 'td:eq(18)'),
-    #:takeaways => get_int(row, 'td:eq(19)'),
-    #:shots_blocked => get_int(row, 'td:eq(20)'),
-    #:faceoffs => {
-    #  :even_strength => get_faceoff_stats(faceoff_cells[0].content),
-    #  :power_play => get_faceoff_stats(faceoff_cells[1].content),
-    #  :short_handed => get_faceoff_stats(faceoff_cells[2].content),
-    #  :total => {
-    #    :won => get_int(row, 'td:eq(21)'),
-    #    :lost => get_int(row, 'td:eq(22)'),
-    #    :percentage => get_percentage(row, 'td:eq(23)')
-    #  }
-    #}
+    :block_attempts => get_int(row, 'td:eq(15)'),
+    :missed_shots => get_int(row, 'td:eq(16)'),
+    :hits => get_int(row, 'td:eq(17)'),
+    :giveaways => get_int(row, 'td:eq(18)'),
+    :takeaways => get_int(row, 'td:eq(19)'),
+    :shots_blocked => get_int(row, 'td:eq(20)'),
+    :faceoffs => {
+      :even_strength => get_faceoff_stats(faceoff_cells[0].content),
+      :power_play => get_faceoff_stats(faceoff_cells[1].content),
+      :short_handed => get_faceoff_stats(faceoff_cells[2].content),
+      :total => {
+        :won => get_int(row, 'td:eq(21)'),
+        :lost => get_int(row, 'td:eq(22)'),
+        :percentage => get_percentage(row, 'td:eq(23)')
+      }
+    }
   }
 end
 
 # TODO: Add team shot totals and game duration
 def add_team_totals(doc, info)
-  # THIS WORKS FOR THE  shots summary
-
   shot_cells = doc.css('body > xmlfile > table > tr:eq(3) > td > table > tr:eq(2) > td > table >tr > td')
-  #shot_cells = doc.css('body > xmlfile > table > tr:eq(3) > td > table > tr:eq(2)  > td > table > tr > td')
-  #binding.pry
-  #doc.css('body > xmlfile > table > tr:eq(3) > td > table > tr:eq(2) > td > table > tr > td:eq(1) > table > tr:eq(2)')
   faceoff_cells = doc.css('body > xmlfile > table > tr:eq(5) > td > table > tr:eq(2) table tr:eq(2) td')
   rows = doc.css('body > xmlfile > table > tr:eq(8) table tr.bold')
   info[:away_totals] = get_team_totals(rows[0], faceoff_cells[0..3], shot_cells[0])
-  #info[:home_totals] = get_team_totals(rows[1], faceoff_cells[4..7])
+  info[:home_totals] = get_team_totals(rows[1], faceoff_cells[4..7])
   info
 end
 

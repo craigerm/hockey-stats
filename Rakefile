@@ -5,7 +5,8 @@ require 'open-uri'
 require 'date'
 require 'json'
 require 'pry'
-require './tasks/scrape'
+require './tasks/scrape_games'
+require './tasks/scrape_plays'
 
 # Total games per year: 1,230
 # 30 teams

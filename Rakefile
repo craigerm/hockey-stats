@@ -55,6 +55,10 @@ def get_scores(start_date, end_date)
   stop
 end
 
+def skip_game_id?(boxid)
+  boxid == '2008011007' # Special game. Flyers vs AHL team
+end
+
 def get_event_summary(year)
   boxscores_path = "#{ROOT_FOLDER}/#{year}/boxscores.txt"
   game_ids = "#{ROOT_FOLDER}/#{year}/game_ids.txt"
@@ -70,6 +74,8 @@ def get_event_summary(year)
         doc.css('a[shape=rect]:contains("BOXSCORE")').each do |link|
           href = link.get_attribute(:href)
           boxid = href.split('?id=')[1]
+          next if skip_game_id?(boxid)
+          puts "#{boxid} => #{href}"
           file.puts href
           games.puts boxid
         end
